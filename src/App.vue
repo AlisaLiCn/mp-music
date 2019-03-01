@@ -16,7 +16,7 @@ export default {
       logs.unshift(Date.now())
       mpvue.setStorageSync({
         key: 'logs',
-        data: logs
+        data: logs,
       })
     } else {
       logs = mpvue.getStorageSync('logs') || []
@@ -26,7 +26,7 @@ export default {
   },
   log () {
     console.log(`log at:${Date.now()}`)
-  }
+  },
 }
 </script>
 

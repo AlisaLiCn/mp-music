@@ -20,5 +20,5 @@ export function formatTime (date) {
 
 export default {
   formatNumber,
-  formatTime
+  formatTime,
 }
