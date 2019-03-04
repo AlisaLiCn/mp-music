@@ -10,18 +10,18 @@ var glob = require('glob')
 var CopyWebpackPlugin = require('copy-webpack-plugin')
 var relative = require('relative')
 
-function resolve (dir) {
+function resolve(dir) {
   return path.join(__dirname, '..', dir)
 }
 
-function getEntry (rootSrc) {
-  var map = {};
+function getEntry(rootSrc) {
+  var map = {}
   glob.sync(rootSrc + '/pages/**/main.js')
-  .forEach(file => {
-    var key = relative(rootSrc, file).replace('.js', '');
-    map[key] = file;
-  })
-   return map;
+    .forEach(file => {
+      var key = relative(rootSrc, file).replace('.js', '')
+      map[key] = file
+    })
+  return map
 }
 
 const appEntry = { app: resolve('./src/main.js') }
@@ -40,17 +40,17 @@ let baseWebpackConfig = {
     filename: '[name].js',
     publicPath: process.env.NODE_ENV === 'production'
       ? config.build.assetsPublicPath
-      : config.dev.assetsPublicPath
+      : config.dev.assetsPublicPath,
   },
   resolve: {
     extensions: ['.js', '.vue', '.json'],
     alias: {
       'vue': 'mpvue',
-      '@': resolve('src')
+      '@': resolve('src'),
     },
     symlinks: false,
     aliasFields: ['mpvue', 'weapp', 'browser'],
-    mainFields: ['browser', 'module', 'main']
+    mainFields: ['browser', 'module', 'main'],
   },
   module: {
     rules: [
@@ -60,13 +60,13 @@ let baseWebpackConfig = {
         enforce: 'pre',
         include: [resolve('src'), resolve('test')],
         options: {
-          formatter: require('eslint-friendly-formatter')
-        }
+          formatter: require('eslint-friendly-formatter'),
+        },
       },
       {
         test: /\.vue$/,
         loader: 'mpvue-loader',
-        options: vueLoaderConfig
+        options: vueLoaderConfig,
       },
       {
         test: /\.js$/,
@@ -75,57 +75,61 @@ let baseWebpackConfig = {
           'babel-loader',
           {
             loader: 'mpvue-loader',
-            options: Object.assign({checkMPEntry: true}, vueLoaderConfig)
+            options: Object.assign({ checkMPEntry: true }, vueLoaderConfig),
           },
-        ]
+        ],
       },
       {
         test: /\.(png|jpe?g|gif|svg)(\?.*)?$/,
         loader: 'url-loader',
         options: {
           limit: 10000,
-          name: utils.assetsPath('img/[name].[ext]')
-        }
+          name: utils.assetsPath('img/[name].[ext]'),
+        },
       },
       {
         test: /\.(mp4|webm|ogg|mp3|wav|flac|aac)(\?.*)?$/,
         loader: 'url-loader',
         options: {
           limit: 10000,
-          name: utils.assetsPath('media/[name].[ext]')
-        }
+          name: utils.assetsPath('media/[name].[ext]'),
+        },
       },
       {
         test: /\.(woff2?|eot|ttf|otf)(\?.*)?$/,
         loader: 'url-loader',
         options: {
           limit: 10000,
-          name: utils.assetsPath('fonts/[name].[ext]')
-        }
-      }
-    ]
+          name: utils.assetsPath('fonts/[name].[ext]'),
+        },
+      },
+      {
+        test: /\.styl$/,
+        loader: ['url-loader', 'css-loader', 'stylus-loader'],
+      },
+    ],
   },
   plugins: [
     // api 统一桥协议方案
     new webpack.DefinePlugin({
       'mpvue': 'global.mpvue',
-      'mpvuePlatform': 'global.mpvuePlatform'
+      'mpvuePlatform': 'global.mpvuePlatform',
     }),
     new MpvuePlugin(),
     new CopyWebpackPlugin([{
       from: '**/*.json',
-      to: ''
+      to: '',
     }], {
-      context: 'src/'
+      context: 'src/',
     }),
     new CopyWebpackPlugin([
       {
         from: path.resolve(__dirname, '../static'),
         to: path.resolve(config.build.assetsRoot, './static'),
-        ignore: ['.*']
-      }
-    ])
-  ]
+        ignore: ['.*'],
+      },
+    ]),
+  ],
 }
 
 // 针对百度小程序，由于不支持通过 miniprogramRoot 进行自定义构建完的文件的根路径
@@ -133,7 +137,7 @@ let baseWebpackConfig = {
 // 然后百度开发者工具将 dist/swan 作为项目根目录打
 const projectConfigMap = {
   tt: '../project.config.json',
-  swan: '../project.swan.json'
+  swan: '../project.swan.json',
 }
 
 const PLATFORM = process.env.PLATFORM
@@ -142,9 +146,9 @@ if (/^(swan)|(tt)$/.test(PLATFORM)) {
     plugins: [
       new CopyWebpackPlugin([{
         from: path.resolve(__dirname, projectConfigMap[PLATFORM]),
-        to: path.resolve(config.build.assetsRoot)
-      }])
-    ]
+        to: path.resolve(config.build.assetsRoot),
+      }]),
+    ],
   })
 }
 
