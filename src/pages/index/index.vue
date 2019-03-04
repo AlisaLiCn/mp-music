@@ -1,57 +1,24 @@
 <template>
-  <div @click="clickHandle">
-
-    <div class="userinfo" @click="bindViewTap">
-      <img class="userinfo-avatar" v-if="userInfo.avatarUrl" :src="userInfo.avatarUrl" background-size="cover"/>
-      <img class="userinfo-avatar" src="/static/images/user.png" background-size="cover"/>
-
-      <div class="userinfo-nickname">
-        <card :text="userInfo.nickName"></card>
-      </div>
-    </div>
-
-    <div class="usermotto">
-      <div class="user-motto">
-        <card :text="motto"></card>
-      </div>
-    </div>
-
-    <form class="form-container">
-      <input type="text" class="form-control" :value="motto" placeholder="v-model"/>
-      <input type="text" class="form-control" v-model="motto" placeholder="v-model"/>
-      <input type="text" class="form-control" v-model.lazy="motto" placeholder="v-model.lazy"/>
-    </form>
-
-    <a href="/pages/counter/main" class="counter">去往Vuex示例页面</a>
-
-    <div class="all">
-      <div class="left">
-      </div>
-      <div class="right">
-      </div>
-    </div>
+  <div>
+    推荐音乐
   </div>
 </template>
 
 <script>
-import card from '@/components/card'
 
 export default {
   data() {
     return {
-      motto: 'Hello miniprograme',
-      userInfo: {
-        nickName: 'mpvue',
-        avatarUrl: 'http://mpvue.com/assets/logo.png',
-      },
+      current: 'tab1',
     }
   },
 
-  components: {
-    card,
-  },
+  components: {},
 
   methods: {
+    handleChange(e) {
+      this.current = e.mp.detail.key
+    },
     bindViewTap() {
       const url = '../logs/main'
       if (mpvuePlatform === 'wx') {
@@ -64,10 +31,19 @@ export default {
       console.log('clickHandle:', ev)
       // throw {message: 'custom test'}
     },
+    async getData() {
+      try {
+        const response = await this.$http.post('/search/hot?params=piAtwOtaLvRA68XKMwDjYKCQ6e/hl9UfnxDZboLYfeg=&encSecKey=159d53b42cd267629ffe7aebbe0c3a9e36732e5efd5d44bd487e559dadb11427b0dbe8f9e961a2ee147014972e8597b45cfe831f1648a3900b323e61aa24f09d1243d9c401ba561bca569e67a931deb8db1fc7b2a985ffdb36fc59d10b941b4d4ecd4590a37cd38694665811f2742a2a6dc5a68da1d95c403c47b183fb3f8420')
+        console.log(response)
+      } catch (error) {
+        console.log(error)
+      }
+    },
   },
 
   created() {
     // let app = getApp()
+    this.getData()
   },
 }
 </script>
