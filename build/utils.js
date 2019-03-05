@@ -6,48 +6,48 @@ var mpvueInfo = require('../node_modules/mpvue/package.json')
 var packageInfo = require('../package.json')
 var mkdirp = require('mkdirp')
 
-exports.assetsPath = function (_path) {
+exports.assetsPath = function(_path) {
   var assetsSubDirectory = process.env.NODE_ENV === 'production'
     ? config.build.assetsSubDirectory
     : config.dev.assetsSubDirectory
   return path.posix.join(assetsSubDirectory, _path)
 }
 
-exports.cssLoaders = function (options) {
+exports.cssLoaders = function(options) {
   options = options || {}
 
   var cssLoader = {
     loader: 'css-loader',
     options: {
       minimize: process.env.NODE_ENV === 'production',
-      sourceMap: options.sourceMap
-    }
+      sourceMap: options.sourceMap,
+    },
   }
 
   var postcssLoader = {
     loader: 'postcss-loader',
     options: {
-      sourceMap: true
-    }
+      sourceMap: true,
+    },
   }
 
   var px2rpxLoader = {
     loader: 'px2rpx-loader',
     options: {
       baseDpr: 1,
-      rpxUnit: 0.5
-    }
+      rpxUnit: 0.5,
+    },
   }
 
   // generate loader string to be used with extract text plugin
-  function generateLoaders (loader, loaderOptions) {
+  function generateLoaders(loader, loaderOptions) {
     var loaders = [cssLoader, px2rpxLoader, postcssLoader]
     if (loader) {
       loaders.push({
         loader: loader + '-loader',
         options: Object.assign({}, loaderOptions, {
-          sourceMap: options.sourceMap
-        })
+          sourceMap: options.sourceMap,
+        }),
       })
     }
 
@@ -56,11 +56,16 @@ exports.cssLoaders = function (options) {
     if (options.extract) {
       return ExtractTextPlugin.extract({
         use: loaders,
-        fallback: 'vue-style-loader'
+        fallback: 'vue-style-loader',
       })
     } else {
       return ['vue-style-loader'].concat(loaders)
     }
+  }
+
+  const stylusOptions = {
+    import: [path.join(__dirname, '../src/styles/variables.styl')],
+    paths: [path.join(__dirname, '../src/styles'), path.join(__dirname, '../')],  //公共样式文件位置
   }
 
   // https://vue-loader.vuejs.org/en/configurations/extract-css.html
@@ -71,20 +76,20 @@ exports.cssLoaders = function (options) {
     less: generateLoaders('less'),
     sass: generateLoaders('sass', { indentedSyntax: true }),
     scss: generateLoaders('sass'),
-    stylus: generateLoaders('stylus'),
-    styl: generateLoaders('stylus')
+    stylus: generateLoaders('stylus', stylusOptions),
+    styl: generateLoaders('stylus'),
   }
 }
 
 // Generate loaders for standalone style files (outside of .vue)
-exports.styleLoaders = function (options) {
+exports.styleLoaders = function(options) {
   var output = []
   var loaders = exports.cssLoaders(options)
   for (var extension in loaders) {
     var loader = loaders[extension]
     output.push({
       test: new RegExp('\\.' + extension + '$'),
-      use: loader
+      use: loader,
     })
   }
   return output
@@ -99,12 +104,12 @@ const writeFile = async (filePath, content) => {
   await fs.writeFileSync(filePath, content, 'utf8')
 }
 
-exports.writeFrameworkinfo = function () {
+exports.writeFrameworkinfo = function() {
   var buildInfo = {
     'toolName': mpvueInfo.name,
     'toolFrameWorkVersion': mpvueInfo.version,
     'toolCliVersion': packageInfo.mpvueTemplateProjectVersion || '',
-    'createTime': Date.now()
+    'createTime': Date.now(),
   }
 
   var content = JSON.stringify(buildInfo)

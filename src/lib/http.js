@@ -15,7 +15,6 @@ fly.config.baseURL = 'https://music-api.alisali.cn/'
 fly.interceptors.response.use(
   (response) => {
     // 只将请求结果的data字段返回
-    console.log(response)
     return response
   },
   (err) => {
