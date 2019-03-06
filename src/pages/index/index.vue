@@ -1,13 +1,17 @@
 <template>
-  <div class="recommend">
+  <div class="recommend-list">
     <div class="section-title">
       推荐歌单
       <i-icon type="enter" size="15" color="#ccc"/>
     </div>
     <div class="songlists">
       <div class="songlist-item" v-for="(i, index) in songLists" :key="index">
+        <div class="songlist-playcount">
+          <i-icon type="customerservice" size="12" color="#fff"/>
+          <span>{{ i.playCount }}</span>
+        </div>
         <img :src="i.picUrl" class="songlist-img">
-        {{ i.name }}
+        <p class="songlist-name">{{ i.name }}</p>
       </div>
     </div>
   </div>
@@ -52,12 +56,13 @@ export default {
 </script>
 
 <style scoped lang="stylus">
-.recommend
+.recommend-list
   padding 20px 10px
 
 .section-title
-  padding-left 4px
   font-size 15px
+  font-weight bold
+  margin-bottom 10px
 
 .songlists
   display flex
@@ -65,6 +70,21 @@ export default {
   flex-wrap wrap
 
 .songlist-item
-  width 33.3%
-
+  position relative
+  width 30vw
+  margin-bottom 10px
+  .songlist-playcount
+    position absolute
+    right 0
+    top 0
+    color #fff
+    font-size 12px
+  .songlist-img
+    width 30vw
+    height 30vw
+  .songlist-name
+    /*max-height 40px*/
+    font-size 13px
+    /*overflow hidden*/
+    /*text-overflow ellipsis*/
 </style>

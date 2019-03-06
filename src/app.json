@@ -1,8 +1,10 @@
 {
   "pages": [
+    "pages/toplist-detail/main",
     "pages/index/main",
-    "pages/list/main",
+    "pages/toplist/main",
     "pages/search/main",
+    "pages/song-detail/main",
     "pages/logs/main"
   ],
   "window": {
@@ -22,7 +24,7 @@
         "text": "推荐"
       },
       {
-        "pagePath": "pages/list/main",
+        "pagePath": "pages/toplist/main",
         "text": "排行榜"
       },
       {
