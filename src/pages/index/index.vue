@@ -27,7 +27,7 @@ export default {
   },
 
   components: {},
-  created() {
+  mounted() {
     this.getSongLists()
   },
   methods: {

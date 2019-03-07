@@ -1,7 +1,11 @@
 <template>
   <div class="playlist">
     <div class="cover">
-      <img :src="playlist.coverImgUrl" class="cover-img">
+      <div class="cover-inner">
+        <div class="cover-icon"></div>
+        <div class="update-time"></div>
+      </div>
+      <!--<img :src="playlist.coverImgUrl" class="cover-img">-->
     </div>
     <div>
       <div class="play-item" v-for="(i, index) in playlist.tracks" :key="index" @click="goToSongDetail(i.id)">
@@ -30,11 +34,11 @@ export default {
       playlist: [],
     }
   },
-  created() {
-    this.getDetail()
+  mounted() {
+    this.getPlayList()
   },
   methods: {
-    async getDetail() {
+    async getPlayList() {
       try {
         const idx = 1
         const response = await this.$http.get(`/top/list?idx=${idx}`)
@@ -42,7 +46,7 @@ export default {
         this.playlist.tracks.forEach(item => {
           item.artists = item.ar.map(i => i.name).join('/')
         })
-        console.log('歌曲列表', this.playlist.tracks)
+        console.log('热歌榜', this.playlist)
       } catch (error) {
         console.log(error)
       }
@@ -56,9 +60,32 @@ export default {
 
 <style scoped lang="stylus">
 
-.cover-img
-  width 100%
-
+.cover
+  position relative
+  background-image url("https://s3.music.126.net/m/s/img/hot_music_bg_2x.jpg?f01a252389c26bcf016816242eaa6aee")
+  background-size contain
+  background-repeat no-repeat
+  padding-top 38.9%
+  .cover-inner
+    position absolute
+    top 0
+    left 0
+    right 0
+    bottom 0
+    padding-left 20px
+    display flex
+    flex-direction column
+    justify-content center
+    z-index 2
+    .cover-icon
+      width 142px
+      height 67px
+      background-image url("https://s3.music.126.net/m/s/img/index_icon_2x.png?5207a28c3767992ca4bb6d4887c74880")
+      background-position -20px -30px
+      background-size 166px 97px
+    .update-time
+      color #fff
+      font-size 12px
 .play-item
   display flex
   justify-content flex-start

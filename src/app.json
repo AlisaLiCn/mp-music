@@ -24,8 +24,8 @@
         "text": "推荐"
       },
       {
-        "pagePath": "pages/toplist/main",
-        "text": "排行榜"
+        "pagePath": "pages/toplist-detail/main",
+        "text": "热歌榜"
       },
       {
         "pagePath": "pages/search/main",

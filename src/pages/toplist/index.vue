@@ -24,7 +24,7 @@ export default {
       topLists: [],
     }
   },
-  created() {
+  mounted() {
     this.getTopList()
   },
   methods: {
