@@ -19,8 +19,10 @@
             {{ songDetail.name }}
             <span v-if="songDetail.alia.length">({{ songDetail.alia[0] }})</span>
           </div>
-          <div class="song-lyric">
-lyric lyric
+          <div class="song-lyric" v-if="lyric">
+            <div v-for="(lyric,index) in lyric.lines" :key="index" :class="{'current': index === lyricCurrentLine}">
+              {{ lyric.txt }}
+            </div>
           </div>
         </div>
       </div>
@@ -29,6 +31,8 @@ lyric lyric
 </template>
 
 <script>
+import Lyric from 'lyric-parser'
+
 export default {
   data() {
     return {
@@ -37,6 +41,8 @@ export default {
       songDetail: null,
       innerAudioContext: null,
       isPlaying: false,
+      lyric: null,
+      lyricCurrentLine: 0,
     }
   },
   onLoad(option) {
@@ -45,13 +51,9 @@ export default {
   mounted() {
     this.createAudioCtx()
     this.getSongDetail()
+    this.getLyric()
   },
-  computed: {
-    text() {
-      console.log('isPlaying: ', this.isPlaying)
-      return this.isPlaying ? '暂停' : '播放'
-    },
-  },
+  computed: {},
   methods: {
     async createAudioCtx() {
       try {
@@ -64,10 +66,8 @@ export default {
         this.innerAudioContext.autoplay = false
         this.innerAudioContext.src = this.songUrl
         this.innerAudioContext.onPlay(() => {
-          console.log('开始播放')
         })
         this.innerAudioContext.onPause(() => {
-          console.log('暂停播放')
         })
         this.innerAudioContext.onError((res) => {
           console.log(res.errMsg)
@@ -84,11 +84,20 @@ export default {
         this.innerAudioContext.play()
       }
       this.isPlaying = !this.isPlaying
+      this.lyric.togglePlay()
     },
     async getSongDetail() {
       const response = await this.$http.get(`/song/detail?ids=${this.songId}`)
       this.songDetail = response.data.songs[0]
       console.log('歌曲detail: ', response.data)
+    },
+    async getLyric() {
+      const response = await this.$http.get(`/lyric?id=${this.songId}`)
+      const lyricStr = response.data.lrc.lyric
+      this.lyric = new Lyric(lyricStr, this.handleLyric)
+    },
+    handleLyric({ lineNum, txt }) {
+      this.lyricCurrentLine = lineNum
     },
   },
 }
@@ -187,6 +196,7 @@ vendors = official
         transform translate(-50%, -50%)
       &.rotate
         animation: rotates 20s linear infinite;
+
 .song-info
   width 200px
   margin 20px auto
@@ -202,4 +212,11 @@ vendors = official
     white-space nowrap
     width 200px
 
+.song-lyric
+  color rgba(255, 255, 255, .6)
+  font-size 10px
+  line-height 1.5
+  text-align center
+  .current
+    color #fff
 </style>
