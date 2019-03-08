@@ -27,12 +27,12 @@
     </div>
     <div class="song-play-info">
       <div class="song-progress">
-        <!--<input type="range" min="0" max="100" v-model="playProgress">-->
-        <!--<input type="range" min="0" max="100" value="90">-->
+        <div class="current-time song-time">{{ currentTime }}</div>
         <div class="bar-bg">
           <div class="bar-inner" :style="{width: playProgress + '%'}"></div>
           <div class="bar-point"></div>
         </div>
+        <div class="duration song-time">{{ duration }}</div>
       </div>
       <div class="song-control">
         <i-icon type="refresh" size="26" color="#fff"/>
@@ -61,6 +61,8 @@ export default {
       lyric: null,
       lyricCurrentLine: 0,
       lyricTop: 0,
+      currentTime: 0,
+      duration: 0,
     }
   },
   onLoad(option) {
@@ -77,7 +79,6 @@ export default {
       try {
         const response = await this.$http.get(`/song/url?id=${this.songId}`)
         this.songUrl = response.data.data[0].url
-        console.log('歌曲详情', response.data)
 
         this.innerAudioContext = wx.createInnerAudioContext()
 
@@ -87,7 +88,8 @@ export default {
         })
         this.innerAudioContext.onTimeUpdate(() => {
           this.playProgress = this.innerAudioContext.currentTime / this.innerAudioContext.duration * 100
-          console.log('progress: ', this.playProgress)
+          this.currentTime = this.formatTime(this.innerAudioContext.currentTime)
+          this.duration = this.formatTime(this.innerAudioContext.duration)
         })
         this.innerAudioContext.onPause(() => {
         })
@@ -121,13 +123,21 @@ export default {
     handleLyric({ lineNum, txt }) {
       this.lyricCurrentLine = lineNum
       if (lineNum > 6) {
-        this.lyricTop = (lineNum - 6) * -18
+        this.lyricTop = (lineNum - 6) * -20
       } else {
         this.lyricTop = 0
       }
     },
     toggleLyricVisible() {
       this.lyricVisible = !this.lyricVisible
+    },
+    formatTime(seconds) {
+      let m, s
+      m = Math.floor(seconds / 60)
+      m = m.toString().length === 1 ? ('0' + m) : m
+      s = Math.floor(seconds - 60 * m)
+      s = s.toString().length === 1 ? ('0' + s) : s
+      return m + ':' + s
     },
   },
   onUnload() {
@@ -186,9 +196,9 @@ vendors = official
 
 .song-disc
   position relative
-  width 200px
-  height 200px
-  margin 100px auto
+  width 260px
+  height 260px
+  margin 80px auto
   .song-disc-light
     position absolute
     top 0
@@ -251,8 +261,8 @@ vendors = official
   flex-direction column
   justify-content center
   color rgba(255, 255, 255, .6)
-  font-size 12px
-  line-height 1.8
+  font-size 14px
+  line-height 2
   text-align center
   .current
     color #fff
@@ -266,12 +276,24 @@ vendors = official
   z-index 10
   .song-control
     display flex
-    justify-content space-around
-    padding 10px 0
+    justify-content space-between
+    padding 10px 20px
 
-$progress-bar-height = 4px
+$progress-bar-height = 3px
 .song-progress
+  display flex
+  justify-content flex-start
+  align-items center
+  padding 0 20px
+  .song-time
+    color #fff
+    font-size 10px
+  .current-time
+    margin-right 5px
+  .duration
+    margin-left 5px
   .bar-bg
+    width calc(100% - 42px)
     position relative
     height $progress-bar-height
     background-color #ccc
