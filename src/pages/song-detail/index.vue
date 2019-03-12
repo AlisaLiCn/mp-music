@@ -28,8 +28,8 @@
     <div class="song-play-info">
       <div class="song-progress">
         <div class="current-time song-time">{{ currentTime }}</div>
-        <div class="bar-bg">
-          <div class="bar-inner" :style="{width: playProgress + '%'}"></div>
+        <div class="bar-bg" @click="seekTime($event)" ref="progress">
+          <div class="bar-inner" :style="{width: playProgress * 100 + '%'}"></div>
           <div class="bar-point"></div>
         </div>
         <div class="duration song-time">{{ duration }}</div>
@@ -77,8 +77,14 @@ export default {
   methods: {
     async createAudioCtx() {
       try {
-        const response = await this.$http.get(`/song/url?id=${this.songId}`)
-        this.songUrl = response.data.data[0].url
+        const responseArr = await Promise.all([
+          this.$http.get(`/song/url?id=${this.songId}`),
+          this.$http.get(`/lyric?id=${this.songId}`),
+        ])
+
+        this.songUrl = responseArr[0].data.data[0].url
+        const lyricStr = responseArr[1].data.lrc.lyric
+        this.lyric = new Lyric(lyricStr, this.handleLyric)
 
         this.innerAudioContext = wx.createInnerAudioContext()
 
@@ -87,16 +93,29 @@ export default {
         this.innerAudioContext.onPlay(() => {
         })
         this.innerAudioContext.onTimeUpdate(() => {
-          this.playProgress = this.innerAudioContext.currentTime / this.innerAudioContext.duration * 100
+          this.playProgress = this.innerAudioContext.currentTime / this.innerAudioContext.duration
           this.currentTime = this.formatTime(this.innerAudioContext.currentTime)
           this.duration = this.formatTime(this.innerAudioContext.duration)
         })
+        this.innerAudioContext.onSeeked(() => {
+          this.playProgress = this.innerAudioContext.currentTime / this.innerAudioContext.duration
+          this.currentTime = this.formatTime(this.innerAudioContext.currentTime)
+        })
         this.innerAudioContext.onPause(() => {
+        })
+        this.innerAudioContext.onEnded(() => {
+          this.isPlaying = false
+          this.lyric.stop()
+          setTimeout(() => {
+            this.lyricTop = 0
+            this.togglePlay()
+          }, 1000)
         })
         this.innerAudioContext.onError((res) => {
           console.log(res.errMsg)
           console.log(res.errCode)
         })
+        this.togglePlay()
       } catch (error) {
         console.log(error)
       }
@@ -109,6 +128,19 @@ export default {
       }
       this.isPlaying = !this.isPlaying
       this.lyric.togglePlay()
+    },
+    async seekTime(event) {
+      let rect = {}
+      const query = wx.createSelectorQuery()
+      query.select('.bar-bg').boundingClientRect()
+      query.exec((res) => {
+        rect.left = res[0].left
+        rect.right = res[0].right
+        let progress = (event.target.x - rect.left) / (rect.right - rect.left)
+        let seekTime = Number((this.innerAudioContext.duration * progress).toFixed(3))
+        this.innerAudioContext.seek(seekTime)
+        this.lyric.seek(seekTime)
+      })
     },
     async getSongDetail() {
       const response = await this.$http.get(`/song/detail?ids=${this.songId}`)
@@ -154,7 +186,7 @@ export default {
   background-size auto 100%
   transform scale(1.5)
   transform-origin center top
-  position absolute
+  position fixed
   left 0
   right 0
   top 0
