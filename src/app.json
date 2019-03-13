@@ -1,9 +1,9 @@
 {
   "pages": [
-    "pages/toplist-detail/main",
+    "pages/search/main",
     "pages/index/main",
     "pages/toplist/main",
-    "pages/search/main",
+    "pages/toplist-detail/main",
     "pages/song-detail/main",
     "pages/logs/main"
   ],
