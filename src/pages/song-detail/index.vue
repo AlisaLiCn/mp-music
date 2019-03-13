@@ -3,10 +3,6 @@
     <div class="song-bg" :style="{backgroundImage: 'url(' + songDetail.al.picUrl + ')'}">
     </div>
     <div class="song-wrapper" @click="toggleLyricVisible">
-      <!--<div class="song-name">-->
-      <!--{{ songDetail.name }}-->
-      <!--<span v-if="songDetail.alia.length">({{ songDetail.alia[0] }})</span>-->
-      <!--</div>-->
       <div class="song-inner">
         <div class="song-disc" v-if="!lyricVisible">
           <div class="song-disc-light"></div>
@@ -28,9 +24,9 @@
     <div class="song-play-info">
       <div class="song-progress">
         <div class="current-time song-time">{{ currentTime }}</div>
-        <div class="bar-bg" @click="seekTime($event)" ref="progress">
+        <div class="bar-bg" @click="handleProgressClick">
           <div class="bar-inner" :style="{width: playProgress * 100 + '%'}"></div>
-          <div class="bar-point"></div>
+          <div class="bar-point" @touchmove="handleProgressTouchMove"></div>
         </div>
         <div class="duration song-time">{{ duration }}</div>
       </div>
@@ -57,6 +53,7 @@ export default {
       innerAudioContext: null,
       isPlaying: false,
       playProgress: 0,
+      progressRect: null,
       lyricVisible: false,
       lyric: null,
       lyricCurrentLine: 0,
@@ -68,9 +65,10 @@ export default {
   onLoad(option) {
     this.songId = option.id
   },
-  mounted() {
-    this.createAudioCtx()
+  async mounted() {
     this.getSongDetail()
+    await this.createAudioCtx()
+    this.getProgressRect()
   },
   computed: {},
   methods: {
@@ -128,19 +126,24 @@ export default {
       this.isPlaying = !this.isPlaying
       this.lyric.togglePlay()
     },
-    async seekTime(event) {
-      let rect = {}
-      const query = wx.createSelectorQuery()
-      query.select('.bar-bg').boundingClientRect()
-      query.exec((res) => {
-        rect.left = res[0].left
-        rect.right = res[0].right
-        let progress = (event.target.x - rect.left) / (rect.right - rect.left)
-        let seekTime = Number((this.innerAudioContext.duration * progress).toFixed(3))
-        this.innerAudioContext.seek(seekTime)
-        console.log(this.lyric)
-        this.lyric.seek(seekTime * 1000)
-      })
+    handleProgressClick(e) {
+      let progress = (e.target.x - this.progressRect.left) / (this.progressRect.right - this.progressRect.left)
+      let seekTime = Number((this.innerAudioContext.duration * progress).toFixed(3))
+      this.seekTime(seekTime)
+    },
+    handleProgressTouchMove(e) {
+      let progress = (e.clientX - this.progressRect.left) / (this.progressRect.right - this.progressRect.left)
+      let seekTime = Number((this.innerAudioContext.duration * progress).toFixed(3))
+      this.seekTime(seekTime)
+    },
+    /**
+     *
+     * @param time 单位为秒
+     * @returns {Promise<void>}
+     */
+    seekTime(time) {
+      this.innerAudioContext.seek(time)
+      this.lyric.seek(time * 1000)
     },
     async getSongDetail() {
       const response = await this.$http.get(`/song/detail?ids=${this.songId}`)
@@ -165,6 +168,15 @@ export default {
       s = s.toString().length === 1 ? ('0' + s) : s
       return m + ':' + s
     },
+    getProgressRect() {
+      const query = wx.createSelectorQuery()
+      query.select('.bar-bg').boundingClientRect()
+      query.exec((res) => {
+        if (res.length) {
+          this.progressRect = res[0]
+        }
+      })
+    },
   },
   onUnload() {
     this.innerAudioContext.destroy()
@@ -188,6 +200,7 @@ export default {
   overflow hidden
   z-index -1
   transition opacity .3s linear
+  filter: blur(5px)
   &:after
     position absolute
     top 0
@@ -315,7 +328,7 @@ $progress-bar-height = 3px
     color #fff
     font-size 10px
   .current-time
-    margin-right 5px
+    margin-right 10px
   .duration
     margin-left 5px
   .bar-bg
@@ -323,10 +336,20 @@ $progress-bar-height = 3px
     position relative
     height $progress-bar-height
     background-color #ccc
+    display flex
+    justify-content flex-start
+    align-items center
     .bar-inner
-      position absolute
-      top 0
-      left 0
       height $progress-bar-height
       background-color $color-primary
+    .bar-point
+      margin-left -6px
+      width 3px
+      height 3px
+      background-color $color-primary
+      border 6px solid #fff
+      border-radius 50%
+      display flex
+      justify-content center
+      align-items center
 </style>
