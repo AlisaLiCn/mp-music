@@ -71,7 +71,6 @@ export default {
   mounted() {
     this.createAudioCtx()
     this.getSongDetail()
-    this.getLyric()
   },
   computed: {},
   methods: {
@@ -139,18 +138,13 @@ export default {
         let progress = (event.target.x - rect.left) / (rect.right - rect.left)
         let seekTime = Number((this.innerAudioContext.duration * progress).toFixed(3))
         this.innerAudioContext.seek(seekTime)
-        this.lyric.seek(seekTime)
+        console.log(this.lyric)
+        this.lyric.seek(seekTime * 1000)
       })
     },
     async getSongDetail() {
       const response = await this.$http.get(`/song/detail?ids=${this.songId}`)
       this.songDetail = response.data.songs[0]
-      console.log('歌曲detail: ', response.data)
-    },
-    async getLyric() {
-      const response = await this.$http.get(`/lyric?id=${this.songId}`)
-      const lyricStr = response.data.lrc.lyric
-      this.lyric = new Lyric(lyricStr, this.handleLyric)
     },
     handleLyric({ lineNum, txt }) {
       this.lyricCurrentLine = lineNum
