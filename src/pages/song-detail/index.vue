@@ -106,8 +106,8 @@ export default {
           this.isPlaying = false
           this.lyric.stop()
           setTimeout(() => {
-            this.lyricTop = 0
             this.togglePlay()
+            this.lyric.seek(0)
           }, 1000)
         })
         this.innerAudioContext.onError((res) => {
