@@ -2,7 +2,6 @@
   <div class="recommend-list">
     <div class="section-title">
       推荐歌单
-      <i-icon type="enter" size="15" color="#ccc"/>
     </div>
     <div class="songlists">
       <div class="songlist-item" v-for="(i, index) in songLists" :key="index" @click="goToDetail(i.id)">
@@ -14,20 +13,29 @@
         <p class="songlist-name">{{ i.name }}</p>
       </div>
     </div>
+    <div class="section-title">
+      最新音乐
+    </div>
+    <div class="newsong-list">
+      <play-list type="search" :playlist="newsongList"></play-list>
+    </div>
   </div>
 </template>
 
 <script>
+import PlayList from '@/components/PlayList'
 
 export default {
   data() {
     return {
       songLists: [],
+      newsongList: [],
     }
   },
-  components: {},
+  components: { PlayList },
   mounted() {
     this.getSongLists()
+    this.getNewsongList()
   },
   methods: {
     handleChange(e) {
@@ -45,10 +53,15 @@ export default {
       try {
         const response = await this.$http.post('/personalized')
         this.songLists = response.data.result.slice(0, 6)
-        console.log('推荐歌单', this.songLists)
       } catch (error) {
         console.log(error)
       }
+    },
+    async getNewsongList() {
+      const response = await this.$http.get('/personalized/newsong')
+      this.newsongList = response.data.result.map(item => {
+        return item.song
+      })
     },
     goToDetail(id) {
       wx.navigateTo({ url: '/pages/playlist-detail/main?id=' + id })
@@ -59,12 +72,14 @@ export default {
 
 <style scoped lang="stylus">
 .recommend-list
-  padding 20px 10px
+  padding 10px 10px
 
 .section-title
   font-size 15px
   font-weight bold
-  margin-bottom 10px
+  margin 15px 0
+  padding-left 10px
+  border-left 3px solid $color-primary
 
 .songlists
   display flex

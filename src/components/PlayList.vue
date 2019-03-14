@@ -13,7 +13,7 @@
           </div>
         </div>
         <div class="play-icon">
-          <i-icon type="playon" size="16" color="#ddd"/>
+          <i-icon type="playon" size="20" color="#ddd"/>
         </div>
       </div>
     </div>
@@ -77,6 +77,7 @@ export default {
     width 100%
     padding 10px 0
     border-bottom 1px solid #eee
+
     .play-name
       .song-name
         margin-bottom 5px
