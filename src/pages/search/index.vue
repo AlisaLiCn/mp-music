@@ -1,7 +1,7 @@
 <template>
   <div class="search-page">
     <div class="search-box">
-      <input v-model="keywords" @focus="suggestsVisible = true" placeholder="搜索歌曲" class="search-input">
+      <input v-model="keywords" @focus.prevent="suggestsVisible = true" placeholder="搜索歌曲" class="search-input">
     </div>
     <div class="search-suggest" v-if="suggestsVisible && keywords && suggestList.length">
       <div class="search-keyword" @click="search()">搜索"{{keywords}}"</div>
@@ -19,13 +19,13 @@
       </div>
     </div>
     <div class="play-list" v-if="playlist.length">
-      <play-list :playlist="playlist"></play-list>
+      <play-list type="search" :playlist="playlist"></play-list>
     </div>
   </div>
 </template>
 
 <script>
-import PlayList from '@/components/search/PlayList'
+import PlayList from '@/components/PlayList'
 
 export default {
   components: {
@@ -54,13 +54,16 @@ export default {
     },
     async getSearchSuggest() {
       const res = await this.$http.get(`/search/suggest?keywords=${this.keywords}&type=mobile`)
-      this.suggestList = res.data.result.allMatch
+      this.suggestList = res.data.result.allMatch || []
     },
     async search() {
       this.suggestsVisible = false
       const res = await this.$http.get(`/search?keywords=${this.keywords}&limit=100`)
       this.playlist = res.data.result.songs
     },
+  },
+  onHide() {
+    this.keywords = ''
   },
   watch: {
     keywords: function(newVal, oldVal) {

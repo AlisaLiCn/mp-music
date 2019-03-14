@@ -19,6 +19,9 @@
             {{ lyric.txt }}
           </div>
         </div>
+        <div class="no-lyric" v-else>
+          纯音乐，请欣赏
+        </div>
       </div>
     </div>
     <div class="song-play-info">
@@ -60,6 +63,7 @@ export default {
       lyricTop: 0,
       currentTime: 0,
       duration: 0,
+      nolyric: false,
     }
   },
   onLoad(option) {
@@ -80,8 +84,12 @@ export default {
         ])
 
         this.songUrl = responseArr[0].data.data[0].url
-        const lyricStr = responseArr[1].data.lrc.lyric
-        this.lyric = new Lyric(lyricStr, this.handleLyric)
+        if (responseArr[1].data.nolyric) {
+          this.nolyric = true
+        } else {
+          const lyricStr = responseArr[1].data.lrc.lyric
+          this.lyric = new Lyric(lyricStr, this.handleLyric)
+        }
 
         this.innerAudioContext = wx.createInnerAudioContext()
 
@@ -124,7 +132,9 @@ export default {
         this.innerAudioContext.play()
       }
       this.isPlaying = !this.isPlaying
-      this.lyric.togglePlay()
+      if (!this.nolyric) {
+        this.lyric.togglePlay()
+      }
     },
     handleProgressClick(e) {
       let progress = (e.target.x - this.progressRect.left) / (this.progressRect.right - this.progressRect.left)
@@ -143,7 +153,9 @@ export default {
      */
     seekTime(time) {
       this.innerAudioContext.seek(time)
-      this.lyric.seek(time * 1000)
+      if (!this.nolyric) {
+        this.lyric.seek(time * 1000)
+      }
     },
     async getSongDetail() {
       const response = await this.$http.get(`/song/detail?ids=${this.songId}`)
@@ -180,6 +192,11 @@ export default {
   },
   onUnload() {
     this.innerAudioContext.destroy()
+    if (!this.nolyric) {
+      this.lyric.destroy()
+    }
+    this.isPlaying = false
+    this.lyricVisible = false
   },
 }
 </script>
@@ -305,6 +322,15 @@ vendors = official
   text-align center
   .current
     color #fff
+
+.no-lyric
+  position absolute
+  top 50%
+  left 50%
+  transform translate(-50%, -50%)
+  color #fff
+  font-size 14px
+  text-align center
 
 .song-play-info
   position absolute

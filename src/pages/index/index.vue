@@ -5,7 +5,7 @@
       <i-icon type="enter" size="15" color="#ccc"/>
     </div>
     <div class="songlists">
-      <div class="songlist-item" v-for="(i, index) in songLists" :key="index">
+      <div class="songlist-item" v-for="(i, index) in songLists" :key="index" @click="goToDetail(i.id)">
         <div class="songlist-playcount">
           <i-icon type="customerservice" size="12" color="#fff"/>
           <span>{{ i.playCount }}</span>
@@ -25,7 +25,6 @@ export default {
       songLists: [],
     }
   },
-
   components: {},
   mounted() {
     this.getSongLists()
@@ -50,6 +49,9 @@ export default {
       } catch (error) {
         console.log(error)
       }
+    },
+    goToDetail(id) {
+      wx.navigateTo({ url: '/pages/playlist-detail/main?id=' + id })
     },
   },
 }
@@ -85,6 +87,7 @@ export default {
   .songlist-name
     /*max-height 40px*/
     font-size 13px
-    /*overflow hidden*/
-    /*text-overflow ellipsis*/
+
+/*overflow hidden*/
+/*text-overflow ellipsis*/
 </style>

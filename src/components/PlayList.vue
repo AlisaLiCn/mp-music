@@ -1,13 +1,16 @@
 <template>
   <div>
     <div class="play-item" v-for="(i, index) in playlist" :key="index" @click="goToSongDetail(i.id)">
+      <div v-if="type !== 'search'" class="play-order" :class="{'hot': type === 'toplist' && index < 3}">{{ index + 1 }}</div>
       <div class="play-info">
         <div class="play-name">
           <div class="song-name">
             {{ i.name }}
-            <span v-if="i.alias.length">({{ i.alias[0] }})</span>
+            <span v-if="i.aliasDisplay">({{ i.aliasDisplay }})</span>
           </div>
-          <div class="artist-name">{{ i.artistList }} - {{ i.album.name }}</div>
+          <div class="artist-name">
+            <div>{{ i.artistListDisplay }} - {{ i.albumDisplay }}</div>
+          </div>
         </div>
         <div class="play-icon">
           <i-icon type="playon" size="16" color="#ddd"/>
@@ -20,12 +23,15 @@
 <script>
 export default {
   props: {
+    type: 'playlist', // playlist / toplist /search
     playlist: [],
   },
   data() {
     let list = this.playlist
     list.forEach(item => {
-      item.artistList = item.artists.map(i => i.name).join('/')
+      item.aliasDisplay = this.type === 'search' ? item.alias[0] : item.alia[0]
+      item.albumDisplay = this.type === 'search' ? item.album.name : item.al.name
+      item.artistListDisplay = this.type === 'search' ? item.artists.map(i => i.name).join('/') : item.ar.map(i => i.name).join('/')
     })
     return {
       list: list,
@@ -38,11 +44,12 @@ export default {
   },
   watch: {
     playlist: function(newVal, oldVal) {
-      console.log(newVal)
       let list = []
       newVal.forEach(item => {
         let obj = item
-        obj.artistList = item.artists.map(i => i.name).join('/')
+        obj.aliasDisplay = this.type === 'search' ? item.alias[0] : item.alia[0]
+        obj.albumDisplay = this.type === 'search' ? item.album.name : item.al.name
+        obj.artistListDisplay = this.type === 'search' ? item.artists.map(i => i.name).join('/') : item.ar.map(i => i.name).join('/')
         list.push(obj)
       })
       this.list = list
@@ -58,6 +65,11 @@ export default {
   align-items center
   font-size 14px
   color #666
+  .play-order
+    padding 5px 15px
+    color #999
+    &.hot
+      color $color-primary
   .play-info
     display flex
     justify-content space-between

@@ -7,31 +7,22 @@
       </div>
       <!--<img :src="playlist.coverImgUrl" class="cover-img">-->
     </div>
-    <div>
-      <div class="play-item" v-for="(i, index) in playlist.tracks" :key="index" @click="goToSongDetail(i.id)">
-        <div class="play-order" :class="{'hot': index < 3}">{{ index + 1 }}</div>
-        <div class="play-info">
-          <div class="play-name">
-            <div class="song-name">
-              {{ i.name }}
-              <span v-if="i.alia.length">({{ i.alia[0] }})</span>
-            </div>
-            <div class="artist-name">{{ i.artists }} - {{ i.al.name }}</div>
-          </div>
-          <div class="play-icon">
-            <i-icon type="playon" size="16" color="#ddd"/>
-          </div>
-        </div>
-      </div>
+    <div v-if="playlist">
+      <play-list type="toplist" :playlist="playlist.tracks"></play-list>
     </div>
   </div>
 </template>
 
 <script>
+import PlayList from '@/components/PlayList'
+
 export default {
+  components: {
+    PlayList,
+  },
   data() {
     return {
-      playlist: [],
+      playlist: null,
     }
   },
   mounted() {
@@ -43,10 +34,6 @@ export default {
         const idx = 1
         const response = await this.$http.get(`/top/list?idx=${idx}`)
         this.playlist = response.data.playlist
-        this.playlist.tracks.forEach(item => {
-          item.artists = item.ar.map(i => i.name).join('/')
-        })
-        console.log('热歌榜', this.playlist)
       } catch (error) {
         console.log(error)
       }
@@ -86,6 +73,7 @@ export default {
     .update-time
       color #fff
       font-size 12px
+
 .play-item
   display flex
   justify-content flex-start
