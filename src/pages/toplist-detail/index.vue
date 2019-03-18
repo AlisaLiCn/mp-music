@@ -1,13 +1,15 @@
 <template>
-  <div class="playlist">
+  <div class="playlist" v-if="playlist">
     <div class="cover">
       <div class="cover-inner">
         <div class="cover-icon"></div>
-        <div class="update-time"></div>
+        <div class="update-time">
+          更新于：{{ playlist.updateTimeDisplay}}
+        </div>
       </div>
       <!--<img :src="playlist.coverImgUrl" class="cover-img">-->
     </div>
-    <div v-if="playlist">
+    <div>
       <play-list type="toplist" :playlist="playlist.tracks"></play-list>
     </div>
   </div>
@@ -34,6 +36,9 @@ export default {
         const idx = 1
         const response = await this.$http.get(`/top/list?idx=${idx}`)
         this.playlist = response.data.playlist
+        const t = new Date(this.playlist.updateTime)
+        this.playlist.updateTimeDisplay = `${t.getMonth() + 1}月${t.getDate()}日`
+        console.log(response.data)
       } catch (error) {
         console.log(error)
       }
@@ -73,6 +78,7 @@ export default {
     .update-time
       color #fff
       font-size 12px
+      margin-top 8px
 
 .play-item
   display flex

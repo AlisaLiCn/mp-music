@@ -7,7 +7,7 @@
       <div class="songlist-item" v-for="(i, index) in songLists" :key="index" @click="goToDetail(i.id)">
         <div class="songlist-playcount">
           <i-icon type="customerservice" size="12" color="#fff"/>
-          <span>{{ i.playCount }}</span>
+          <span>{{ i.playCountDisplay }}</span>
         </div>
         <img :src="i.picUrl" class="songlist-img">
         <p class="songlist-name">{{ i.name }}</p>
@@ -53,6 +53,9 @@ export default {
       try {
         const response = await this.$http.post('/personalized')
         this.songLists = response.data.result.slice(0, 6)
+        this.songLists.forEach(item => {
+          item.playCountDisplay = item.playCount >= 10000 ? Math.floor(item.playCount / 10000) + '万' : item.playCount
+        })
       } catch (error) {
         console.log(error)
       }
