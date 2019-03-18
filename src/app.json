@@ -1,0 +1,43 @@
+{
+  "pages": [
+    "pages/index/main",
+    "pages/playlist-detail/main",
+    "pages/toplist/main",
+    "pages/toplist-detail/main",
+    "pages/song-detail/main",
+    "pages/search/main",
+    "pages/logs/main"
+  ],
+  "window": {
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#fff",
+    "navigationBarTitleText": "云音乐",
+    "navigationBarTextStyle": "black"
+  },
+  "tabBar": {
+    "color": "#333",
+    "selectedColor": "#d33a31",
+    "backgroundColor": "#fff",
+    "borderStyle": "black",
+    "list": [
+      {
+        "pagePath": "pages/index/main",
+        "text": "推荐"
+      },
+      {
+        "pagePath": "pages/toplist-detail/main",
+        "text": "热歌榜"
+      },
+      {
+        "pagePath": "pages/search/main",
+        "text": "搜索"
+      }
+    ],
+    "position": "top"
+  },
+  "usingComponents": {
+    "i-icon": "../../static/iview/icon/index",
+    "i-tabs": "../../static/iview/tabs/index",
+    "i-tab": "../../static/iview/tab/index"
+  }
+}
