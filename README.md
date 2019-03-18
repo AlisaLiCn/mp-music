@@ -103,6 +103,7 @@ npm run dev
 构建完成后，使用微信开发者工具打开，也可使用手机扫码预览
 
 截图预览：
+
 ![](https://blog.alisali.cn/2019/03/18/%E5%BE%AE%E4%BF%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F-%E7%BD%91%E6%98%93%E4%BA%91%E9%9F%B3%E4%B9%90/play-list.jpg)
 
 ![](https://blog.alisali.cn/2019/03/18/%E5%BE%AE%E4%BF%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F-%E7%BD%91%E6%98%93%E4%BA%91%E9%9F%B3%E4%B9%90/play-search.jpg)
